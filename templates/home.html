@@ -2,49 +2,201 @@
 
 {% block content %}
 
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Login Page</title>
-        <!-- اضافه کردن Animate.css از طریق CDN -->
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
-        <style>
-            body {
-                font-family: Arial, sans-serif;
-                text-align: center;
-                margin-top: 50px;
-            }
-            .login-form {
-                max-width: 400px;
-                margin: 0 auto;
-                padding: 20px;
-                border: 1px solid #ccc;
-                border-radius: 5px;
-                background-color: #f9f9f9;
-            }
-        </style>
-    </head>
-    <body>
-        <div class="animate__animated animate__zoomIn">
-            <h1>Login</h1>
-            <div class="login-form">
-                <form method="post" action="{% url 'login' %}">
-                    {% csrf_token %}
-                    <div class="mb-3">
-                        <label for="username" class="form-label">Username</label>
-                        <input type="text" class="form-control" id="username" name="username" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="password" class="form-label">Password</label>
-                        <input type="password" class="form-control" id="password" name="password" required>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Login</button>
-                </form>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login & Signup</title>
+    <!-- اضافه کردن SweetAlert2 از طریق CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- اضافه کردن Google Sign-In API -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <!-- استایل‌های تم تاریک -->
+    <style>
+        body {
+            background-color: #121212; /* پس‌زمینه سیاه */
+            color: #ffffff;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .auth-container {
+            background-color: #1e1e1e;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+            width: 300px;
+            text-align: center;
+        }
+        .auth-container h2 {
+            margin-bottom: 1.5rem;
+            color: #ffffff;
+        }
+        .auth-container input {
+            width: 100%;
+            padding: 0.75rem;
+            margin: 0.5rem 0;
+            border: none;
+            border-radius: 5px;
+            background-color: #333333;
+            color: #ffffff;
+        }
+        .auth-container input::placeholder {
+            color: #aaaaaa;
+        }
+        .auth-container button {
+            width: 100%;
+            padding: 0.75rem;
+            margin-top: 1rem;
+            border: none;
+            border-radius: 5px;
+            background-color: #6200ea;
+            color: #ffffff;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+        .auth-container button:hover {
+            background-color: #3700b3;
+        }
+        .auth-container a {
+            color: #bb86fc;
+            text-decoration: none;
+            display: block;
+            margin-top: 1rem;
+        }
+        .auth-container a:hover {
+            text-decoration: underline;
+        }
+        .toggle-auth {
+            margin-top: 1rem;
+            color: #bb86fc;
+            cursor: pointer;
+        }
+        .toggle-auth:hover {
+            text-decoration: underline;
+        }
+        .google-signin {
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container" id="loginContainer">
+        <h2>Login</h2>
+        <form id="loginForm">
+            <input type="text" placeholder="Username" required>
+            <input type="password" placeholder="Password" required>
+            <button type="submit">Login</button>
+        </form>
+        <div class="google-signin">
+            <div id="g_id_onload"
+                data-client_id="YOUR_GOOGLE_CLIENT_ID"
+                data-context="signin"
+                data-ux_mode="popup"
+                data-callback="handleGoogleSignIn"
+                data-auto_prompt="false">
+            </div>
+            <div class="g_id_signin"
+                data-type="standard"
+                data-shape="rectangular"
+                data-theme="filled_blue"
+                data-text="signin_with"
+                data-size="large"
+                data-logo_alignment="left">
             </div>
         </div>
-    </body>
-    </html>
+        <a href="#">Forgot Password?</a>
+        <div class="toggle-auth" onclick="toggleAuth('signup')">Don't have an account? Sign up</div>
+    </div>
 
+    <div class="auth-container" id="signupContainer" style="display: none;">
+        <h2>Sign Up</h2>
+        <form id="signupForm">
+            <input type="text" placeholder="Username" required>
+            <input type="email" placeholder="Email" required>
+            <input type="password" placeholder="Password" required>
+            <input type="password" placeholder="Confirm Password" required>
+            <button type="submit">Sign Up</button>
+        </form>
+        <div class="toggle-auth" onclick="toggleAuth('login')">Already have an account? Login</div>
+    </div>
+
+    <script>
+        // نمایش پیام خوش‌آمدگویی بعد از لاگین
+        function showLoginAlert() {
+            Swal.fire({
+                title: 'Welcome!',
+                text: 'You have successfully logged in.',
+                icon: 'success',
+                confirmButtonText: 'OK',
+                timer: 3000,
+                background: '#1e1e1e',
+                color: '#ffffff',
+                confirmButtonColor: '#6200ea'
+            });
+        }
+
+        // نمایش پیام موفقیت‌آمیز بعد از ثبت‌نام
+        function showSignupAlert() {
+            Swal.fire({
+                title: 'Success!',
+                text: 'You have successfully signed up.',
+                icon: 'success',
+                confirmButtonText: 'OK',
+                timer: 3000,
+                background: '#1e1e1e',
+                color: '#ffffff',
+                confirmButtonColor: '#6200ea'
+            });
+        }
+
+        // مدیریت فرم لاگین
+        document.getElementById('loginForm').addEventListener('submit', function(event) {
+            event.preventDefault();  // جلوگیری از ارسال فرم
+            showLoginAlert();  // نمایش پیام خوش‌آمدگویی
+            // در اینجا می‌توانید لاگیک لاگین را اضافه کنید (مثلاً ارسال درخواست به سرور)
+        });
+
+        // مدیریت فرم ثبت‌نام
+        document.getElementById('signupForm').addEventListener('submit', function(event) {
+            event.preventDefault();  // جلوگیری از ارسال فرم
+            showSignupAlert();  // نمایش پیام موفقیت‌آمیز
+            // در اینجا می‌توانید لاگیک ثبت‌نام را اضافه کنید (مثلاً ارسال درخواست به سرور)
+        });
+
+        // تغییر بین فرم‌های لاگین و ثبت‌نام
+        function toggleAuth(formType) {
+            if (formType === 'signup') {
+                document.getElementById('loginContainer').style.display = 'none';
+                document.getElementById('signupContainer').style.display = 'block';
+            } else {
+                document.getElementById('signupContainer').style.display = 'none';
+                document.getElementById('loginContainer').style.display = 'block';
+            }
+        }
+
+        // مدیریت ثبت‌نام با گوگل
+        function handleGoogleSignIn(response) {
+            // این تابع پس از موفقیت‌آمیز بودن ثبت‌نام با گوگل فراخوانی می‌شود
+            const { credential } = response; // توکن JWT
+            Swal.fire({
+                title: 'Success!',
+                text: 'You have successfully signed in with Google.',
+                icon: 'success',
+                confirmButtonText: 'OK',
+                timer: 3000,
+                background: '#1e1e1e',
+                color: '#ffffff',
+                confirmButtonColor: '#6200ea'
+            });
+            // در اینجا می‌توانید توکن را به سرور ارسال کنید و کاربر را احراز هویت کنید
+            console.log('Google Sign-In Token:', credential);
+        }
+    </script>
+</body>
+</html>
 {% endblock content %}

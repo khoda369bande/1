@@ -8,3 +8,11 @@ class MessageViewTest(SimpleTestCase):
         self.assertTemplateUsed(response, 'home.html')
 
 # Create your tests here.
+
+class UserViewTest(SimpleTestCase):
+    def test_user_view(self):
+        response = self.client.get(reverse('user'))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'user.html')
+
+
