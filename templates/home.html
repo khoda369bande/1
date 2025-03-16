@@ -7,7 +7,7 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Animate.css Example</title>
+        <title>Login Page</title>
         <!-- اضافه کردن Animate.css از طریق CDN -->
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
         <style>
@@ -16,12 +16,33 @@
                 text-align: center;
                 margin-top: 50px;
             }
+            .login-form {
+                max-width: 400px;
+                margin: 0 auto;
+                padding: 20px;
+                border: 1px solid #ccc;
+                border-radius: 5px;
+                background-color: #f9f9f9;
+            }
         </style>
     </head>
     <body>
         <div class="animate__animated animate__zoomIn">
-            <h1>Hello, World!</h1>
-            <p>This is a test message.</p>
+            <h1>Login</h1>
+            <div class="login-form">
+                <form method="post" action="{% url 'login' %}">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Username</label>
+                        <input type="text" class="form-control" id="username" name="username" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="password" name="password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Login</button>
+                </form>
+            </div>
         </div>
     </body>
     </html>
@@ -35,4 +56,3 @@
     </ul>
 
 {% endblock content %}
-
