@@ -26,4 +26,13 @@
     </body>
     </html>
 
+    <ul>
+        {% for message in message_list %}
+            <li>{{ message.name }}</li>
+            <li>{{ message.email }}</li>
+            <li>{{ message.message }}</li>
+        {% endfor %}
+    </ul>
+
 {% endblock content %}
+
